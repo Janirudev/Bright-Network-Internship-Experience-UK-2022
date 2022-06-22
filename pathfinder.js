@@ -22,6 +22,7 @@ var closedSet = [];
 var start, end, w, h;
 var path = [];
 var noSolution = false;
+var steps = 0;
 var outputStr = '';
 
 function Cell(i, j) {
@@ -61,6 +62,12 @@ function Cell(i, j) {
     }
     if (j > 0) {
       this.neighbors.push(grid[i][j - 1]);
+    }
+    if (i > 0 && j > 0) {
+      this.neighbors.push(grid[i - 1][j - 1]);
+    }
+    if (i < cols - 1 && j > 0) {
+      this.neighbors.push(grid[i + 1][j - 1]);
     }
   };
 }
@@ -126,8 +133,10 @@ function draw() {
 
       for (var i = path.length - 1; i >= 0; i--) {
         outputStr = `${outputStr} (${path[i].x}, ${path[i].y}),`;
-        console.log(outputStr);
       }
+
+      console.log('[' + outputStr + ']');
+      console.log(`Steps: ${steps}`);
     }
 
     removeFromArray(openSet, current);
@@ -140,6 +149,7 @@ function draw() {
 
       if (!closedSet.includes(neighbor) && !neighbor.wall) {
         var tempG = current.g + 1;
+        steps = steps + 1;
 
         if (openSet.includes(neighbor)) {
           if (tempG < neighbor.g) {
@@ -160,7 +170,7 @@ function draw() {
   } else {
     // no solution
     console.log('Unable to reach delivery');
-    noSolution = false;
+    return;
     noLoop();
   }
 
@@ -180,15 +190,13 @@ function draw() {
     openSet[i].show(color(0, 255, 0));
   }
 
-  if (!noSolution) {
-    path = [];
-    var temp = current;
-    path.push(temp);
+  path = [];
+  var temp = current;
+  path.push(temp);
 
-    while (temp.previous) {
-      path.push(temp.previous);
-      temp = temp.previous;
-    }
+  while (temp.previous) {
+    path.push(temp.previous);
+    temp = temp.previous;
   }
 
   for (var i = 0; i < path.length; i++) {
