@@ -21,6 +21,8 @@ var closedSet = [];
 
 var start, end, w, h;
 var path = [];
+var noSolution = false;
+var outputStr = '';
 
 function Cell(i, j) {
   this.x = i;
@@ -88,6 +90,8 @@ function setup() {
 
   start = grid[0][0];
   end = grid[cols - 1][rows - 1];
+  start.wall = false;
+  end.wall = false;
 
   openSet.push(start);
 
@@ -108,10 +112,22 @@ function draw() {
 
     // Finishes
     if (current == end) {
-      for (var i = path.length - 1; i >= 0; i--) {
-        console.log(`${path[i].x}, ${path[i].y}`);
-      }
       console.log('Done');
+      noLoop();
+
+      path = [];
+      var temp = current;
+      path.push(temp);
+
+      while (temp.previous) {
+        path.push(temp.previous);
+        temp = temp.previous;
+      }
+
+      for (var i = path.length - 1; i >= 0; i--) {
+        outputStr = `${outputStr} (${path[i].x}, ${path[i].y}),`;
+        console.log(outputStr);
+      }
     }
 
     removeFromArray(openSet, current);
@@ -122,7 +138,7 @@ function draw() {
     for (var i = 0; i < neighbors.length; i++) {
       var neighbor = neighbors[i];
 
-      if (!closedSet.includes(neighbor)) {
+      if (!closedSet.includes(neighbor) && !neighbor.wall) {
         var tempG = current.g + 1;
 
         if (openSet.includes(neighbor)) {
@@ -143,6 +159,9 @@ function draw() {
     // Solution
   } else {
     // no solution
+    console.log('Unable to reach delivery');
+    noSolution = false;
+    noLoop();
   }
 
   background(0);
@@ -156,18 +175,20 @@ function draw() {
   for (var i = 0; i < closedSet.length; i++) {
     closedSet[i].show(color(255, 0, 0));
   }
+
   for (var i = 0; i < openSet.length; i++) {
     openSet[i].show(color(0, 255, 0));
   }
 
-  // Eval current path every frame
-  path = [];
-  var temp = current;
-  path.push(temp);
+  if (!noSolution) {
+    path = [];
+    var temp = current;
+    path.push(temp);
 
-  while (temp.previous) {
-    path.push(temp.previous);
-    temp = temp.previous;
+    while (temp.previous) {
+      path.push(temp.previous);
+      temp = temp.previous;
+    }
   }
 
   for (var i = 0; i < path.length; i++) {
