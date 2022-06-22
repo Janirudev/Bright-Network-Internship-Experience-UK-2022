@@ -35,7 +35,7 @@ function Cell(i, j) {
   this.previous = undefined;
   this.wall = false;
 
-  if (random(1) < 0.1) {
+  if (random(1) < 0.22) {
     this.wall = true;
   }
 
@@ -137,6 +137,9 @@ function draw() {
 
       console.log('[' + outputStr + ']');
       console.log(`Steps: ${steps}`);
+
+      document.getElementById('path').innerText = 'Path: [' + outputStr + ']';
+      document.getElementById('steps').innerText = `Steps: ${steps}`;
     }
 
     removeFromArray(openSet, current);
@@ -170,7 +173,8 @@ function draw() {
   } else {
     // no solution
     console.log('Unable to reach delivery');
-    return;
+
+    document.getElementById('path').innerText = 'Path: [' + outputStr + ']';
     noLoop();
   }
 
